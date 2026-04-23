@@ -101,6 +101,7 @@ export interface AnalyzeResponse {
 export type Language = 'en' | 'hi' | 'kn';
 export type RecommendationType = 'irrigation' | 'fertilizer' | 'pest_control' | 'nutrient' | 'general';
 export type Priority = 'high' | 'medium' | 'low';
+export type MapTheme = 'default' | 'vegetation' | 'weather' | 'heat';
 
 export interface RecommendationItem {
   id: string;
@@ -147,6 +148,7 @@ export interface AppState {
   analysisResult: AnalyzeResponse['data'] | null;
   recommendations: RecommendationItem[];
   recommendationSummary: RecommendationSummary | null;
+  mapTheme: MapTheme;
 }
 
 // ============================================================

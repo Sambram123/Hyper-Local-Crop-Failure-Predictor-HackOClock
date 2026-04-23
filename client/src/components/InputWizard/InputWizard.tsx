@@ -301,6 +301,16 @@ function StepProgress({ currentStep, totalSteps }: { currentStep: number; totalS
 // Step 1: District
 // ============================================================
 
+import DistrictMap from '../Map/DistrictMap';
+
+function findNearestDistrict(lat: number, lon: number): District {
+  return DISTRICTS.reduce((prev, curr) => {
+    const prevDist = Math.sqrt(Math.pow(prev.lat - lat, 2) + Math.pow(prev.lon - lon, 2));
+    const currDist = Math.sqrt(Math.pow(curr.lat - lat, 2) + Math.pow(curr.lon - lon, 2));
+    return currDist < prevDist ? curr : prev;
+  });
+}
+
 function Step1District({ selected, onSelect, search, onSearch, districts }: {
   selected: District | null;
   onSelect: (d: District) => void;
@@ -308,6 +318,8 @@ function Step1District({ selected, onSelect, search, onSearch, districts }: {
   onSearch: (s: string) => void;
   districts: District[];
 }) {
+  const mapCenter: [number, number] = selected ? [selected.lat, selected.lon] : [15.3173, 75.7139]; // Default to Karnataka center
+
   return (
     <div>
       <h2 className="heading-section" style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: 'white' }}>
@@ -316,6 +328,17 @@ function Step1District({ selected, onSelect, search, onSearch, districts }: {
       <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '1.25rem', fontSize: '0.9rem' }}>
         We'll use local weather and satellite data for your area
       </p>
+
+      {/* Map View */}
+      <DistrictMap
+        center={mapCenter}
+        selectedLocation={selected ? [selected.lat, selected.lon] : null}
+        onLocationSelect={(lat, lon) => {
+          const nearest = findNearestDistrict(lat, lon);
+          onSelect(nearest);
+        }}
+        className="mb-6"
+      />
 
       <input
         id="district-search"

@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import ScoreGauge from './ScoreGauge';
 import ChannelBar from './ChannelBar';
 import ForecastChart from './ForecastChart';
+import DistrictMap from '../Map/DistrictMap';
 
 export default function RiskDashboard() {
   const { state, goToRecommendations, goToInput, resetForm } = useApp();
@@ -22,13 +23,15 @@ export default function RiskDashboard() {
     { label: 'Wind', value: `${weather.current.windSpeed.value}km/h`, icon: '🌬️', color: '#94a3b8' },
   ];
 
+  const mapCenter: [number, number] = district ? [district.lat, district.lon] : [15.3173, 75.7139];
+
   return (
     <div style={{
       minHeight: '100svh',
       background: 'linear-gradient(135deg, #020a02 0%, #0a1f0a 60%, #041a1a 100%)',
       padding: '0 0 6rem',
     }}>
-      {/* Top nav bar */}
+      {/* ... existing top nav ... */}
       <div style={{
         position: 'sticky',
         top: 0,
@@ -101,6 +104,27 @@ export default function RiskDashboard() {
           <span style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.5)' }}>{crop?.icon} {crop?.name.en}</span>
           <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
           <span style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.5)' }}>{stage?.icon} {stage?.name.en}</span>
+        </motion.div>
+
+        {/* === GEOSPATIAL FIELD VIEW === */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass overflow-hidden"
+          style={{ marginBottom: '1.25rem', padding: '0' }}
+        >
+          <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Field Monitoring
+            </h3>
+            <span style={{ fontSize: '0.7rem', color: '#4ade80', fontWeight: 600 }}>LIVE VIEW</span>
+          </div>
+          <DistrictMap
+            center={mapCenter}
+            selectedLocation={mapCenter}
+            onLocationSelect={() => {}} // No selection on dashboard
+            className="rounded-none border-none"
+          />
         </motion.div>
 
         {/* === COMPOSITE SCORE CARD === */}

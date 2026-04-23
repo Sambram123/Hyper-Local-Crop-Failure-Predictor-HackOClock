@@ -13,6 +13,7 @@ type AppAction =
   | { type: 'SET_VIEW'; payload: AppState['currentView'] }
   | { type: 'SET_ANALYSIS_RESULT'; payload: AnalyzeResponse['data'] }
   | { type: 'SET_RECOMMENDATIONS'; payload: { items: RecommendationItem[]; summary: RecommendationSummary } }
+  | { type: 'SET_MAP_THEME'; payload: MapTheme }
   | { type: 'RESET_FORM' };
 
 // ============================================================
@@ -28,6 +29,7 @@ const initialState: AppState = {
   analysisResult: null,
   recommendations: [],
   recommendationSummary: null,
+  mapTheme: 'default',
 };
 
 // ============================================================
@@ -50,6 +52,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, analysisResult: action.payload };
     case 'SET_RECOMMENDATIONS':
       return { ...state, recommendations: action.payload.items, recommendationSummary: action.payload.summary };
+    case 'SET_MAP_THEME':
+      return { ...state, mapTheme: action.payload };
     case 'RESET_FORM':
       return { ...initialState, language: state.language };
     default:
@@ -70,6 +74,7 @@ interface AppContextValue {
   setView: (v: AppState['currentView']) => void;
   setAnalysisResult: (r: AnalyzeResponse['data']) => void;
   setRecommendations: (items: RecommendationItem[], summary: RecommendationSummary) => void;
+  setMapTheme: (t: MapTheme) => void;
   goToInput: () => void;
   goToDashboard: () => void;
   goToRecommendations: () => void;
@@ -94,6 +99,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const setAnalysisResult = (r: AnalyzeResponse['data']) => dispatch({ type: 'SET_ANALYSIS_RESULT', payload: r });
   const setRecommendations = (items: RecommendationItem[], summary: RecommendationSummary) =>
     dispatch({ type: 'SET_RECOMMENDATIONS', payload: { items, summary } });
+  const setMapTheme = (t: MapTheme) => dispatch({ type: 'SET_MAP_THEME', payload: t });
   const goToInput = () => dispatch({ type: 'SET_VIEW', payload: 'input' });
   const goToDashboard = () => dispatch({ type: 'SET_VIEW', payload: 'dashboard' });
   const goToRecommendations = () => dispatch({ type: 'SET_VIEW', payload: 'recommendations' });
@@ -103,7 +109,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider value={{
       state, setDistrict, setCrop, setStage, setLanguage, setView,
-      setAnalysisResult, setRecommendations,
+      setAnalysisResult, setRecommendations, setMapTheme,
       goToInput, goToDashboard, goToRecommendations, goToHero, resetForm,
     }}>
       {children}
