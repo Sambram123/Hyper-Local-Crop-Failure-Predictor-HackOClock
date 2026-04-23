@@ -1,4 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+// @ts-ignore
+import fallbackDataRaw from '../data/fallbackRecommendations.json';
 
 export const GEMINI_MODEL_NAME = 'gemini-1.5-flash';
 
@@ -15,25 +17,34 @@ Rules you must follow:
    "within the next 48 hours"). Vague advice like "irrigate as needed" is not acceptable.
 2. Prioritise recommendations by risk severity — address the highest-scoring channel first.
 3. Write at a Grade 5 comprehension level. Short sentences. Simple words. No jargon.
-4. The "reason" field must be one sentence that explains WHY, so a farmer with no
-   agricultural training can understand it.
-5. Generate the same recommendations in Kannada (kn), Hindi (hi), and English (en).
-   Each language array must have the same number of items in the same order.
-6. Return ONLY valid JSON. No markdown, no code fences, no explanation outside JSON.
+4. Provide translations directly in the title and description objects for English (en), Hindi (hi), and Kannada (kn).
+5. The "voiceText" must be one short sentence in Kannada summarizing the action for voice readout.
+6. Return ONLY valid JSON matching the exact schema below. No markdown, no code fences.
 
-Output format (strict):
+Output format (strict JSON):
 {
-  "kannada": [
+  "recommendations": [
     {
-      "type": "irrigation" | "fertilizer" | "pesticide" | "monitoring" | "other",
-      "urgency": "immediate" | "within3days" | "thisweek",
-      "action": "<specific action in Kannada script>",
-      "reason": "<one sentence reason in Kannada script>"
+      "id": "rec_001",
+      "type": "irrigation",
+      "priority": "high",
+      "title": { "en": "...", "hi": "...", "kn": "..." },
+      "description": { "en": "...", "hi": "...", "kn": "..." },
+      "quantity": "4 cm",
+      "timing": "within 48 hours",
+      "voiceText": "..."
     }
   ],
-  "hindi": [ { same structure } ],
-  "english": [ { same structure } ]
-}`;
+  "summary": {
+    "overallRisk": "high",
+    "primaryConcern": "drought stress",
+    "actionRequired": true
+  }
+}
+
+Note: "type" must be one of: "irrigation", "fertilizer", "pest_control", "nutrient", "general".
+"priority" must be one of: "high", "medium", "low".
+"overallRisk" must be one of: "low", "moderate", "high", "critical".`;
 
 export interface RiskPayload {
   crop: string;
@@ -60,23 +71,33 @@ export interface RiskPayload {
   soilType: string;
 }
 
-export interface Recommendation {
-  type: 'irrigation' | 'fertilizer' | 'pesticide' | 'monitoring' | 'other';
-  urgency: 'immediate' | 'within3days' | 'thisweek';
-  action: string;
-  reason: string;
+export interface RecommendationItem {
+  id: string;
+  type: 'irrigation' | 'fertilizer' | 'pest_control' | 'nutrient' | 'general';
+  priority: 'high' | 'medium' | 'low';
+  title: { en: string; hi: string; kn: string };
+  description: { en: string; hi: string; kn: string };
+  quantity?: string;
+  timing?: string;
+  estimatedCost?: number;
+  estimatedCostUnit?: string;
+  voiceText?: string;
 }
 
-export interface RecommendationOutput {
-  kannada: Recommendation[];
-  hindi: Recommendation[];
-  english: Recommendation[];
+export interface RecommendationSummary {
+  overallRisk: 'low' | 'moderate' | 'high' | 'critical';
+  primaryConcern: string;
+  actionRequired: boolean;
 }
 
 export interface GeminiResult {
   success: boolean;
-  recommendations: RecommendationOutput;
-  aiGenerated: boolean;
+  data: {
+    recommendations: RecommendationItem[];
+    summary: RecommendationSummary;
+    generatedBy?: string;
+    aiGenerated?: boolean;
+  };
 }
 
 export function buildUserMessage(payload: RiskPayload): string {
@@ -204,6 +225,16 @@ function getFallbackRecommendations(payload: RiskPayload): GeminiResult {
   });
 
   return { success: true, recommendations: recs, aiGenerated: false };
+function getFallbackRecommendations(_payload: RiskPayload): GeminiResult {
+  const fallback = fallbackDataRaw as { recommendations: RecommendationItem[]; summary: RecommendationSummary };
+  return { 
+    success: true, 
+    data: {
+      recommendations: fallback.recommendations,
+      summary: fallback.summary,
+      aiGenerated: false
+    }
+  };
 }
 
 export async function getRecommendations(payload: RiskPayload): Promise<GeminiResult> {
@@ -222,15 +253,23 @@ export async function getRecommendations(payload: RiskPayload): Promise<GeminiRe
     let text = result.response.text();
 
     // Strip markdown code fences if Gemini wraps the output
-    text = text.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '');
+    text = text.replace(/^\s*```(?:json)?\s*\n?/i, '').replace(/\n?\s*```\s*$/i, '');
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Gemini returns dynamic JSON
-    const parsed: RecommendationOutput = JSON.parse(text);
-    if (!parsed.kannada || !parsed.hindi || !parsed.english) {
-      throw new Error('Gemini response missing required language keys');
+    const parsed = JSON.parse(text);
+    if (!parsed.recommendations || !parsed.summary) {
+      throw new Error('Gemini response missing required keys');
     }
 
-    return { success: true, recommendations: parsed, aiGenerated: true };
+    return { 
+      success: true, 
+      data: {
+        recommendations: parsed.recommendations,
+        summary: parsed.summary,
+        generatedBy: GEMINI_MODEL_NAME,
+        aiGenerated: true
+      }
+    };
   } catch (err) {
     console.error(`[gemini] Error generating recommendations: ${String(err)}`);
     return getFallbackRecommendations(payload);

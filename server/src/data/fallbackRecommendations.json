@@ -1,0 +1,69 @@
+{
+  "recommendations": [
+    {
+      "id": "fallback_001",
+      "type": "irrigation",
+      "priority": "high",
+      "title": {
+        "en": "Immediate Irrigation Required",
+        "hi": "तुरंत सिंचाई आवश्यक",
+        "kn": "ತಕ್ಷಣದ ನೀರಾವರಿ ಅಗತ್ಯ"
+      },
+      "description": {
+        "en": "Apply 2 liters of water per square meter today. Soil moisture is critically low with no rain forecast for 7 days.",
+        "hi": "आज प्रति वर्ग मीटर 2 लीटर पानी दें। अगले 7 दिनों तक बारिश की संभावना नहीं है।",
+        "kn": "ಇಂದು ಪ್ರತಿ ಚದರ ಮೀಟರ್‌ಗೆ 2 ಲೀಟರ್ ನೀರು ಹಾಕಿ. 7 ದಿನ ಮಳೆ ಇಲ್ಲ."
+      },
+      "quantity": "2 L/m²",
+      "timing": "Today before 9 AM",
+      "estimatedCost": 0,
+      "estimatedCostUnit": "labor only",
+      "voiceText": "ಇಂದು ಬೆಳಿಗ್ಗೆ 9 ಗಂಟೆಯ ಮೊದಲು ನೀರು ಹಾಕಿ. ಪ್ರತಿ ಚದರ ಮೀಟರ್‌ಗೆ 2 ಲೀಟರ್."
+    },
+    {
+      "id": "fallback_002",
+      "type": "fertilizer",
+      "priority": "high",
+      "title": {
+        "en": "Apply Urea Top-Dressing",
+        "hi": "यूरिया टॉप ड्रेसिंग करें",
+        "kn": "ಯೂರಿಯಾ ಸಾರವರ್ಧನ ಮಾಡಿ"
+      },
+      "description": {
+        "en": "Apply 15 kg/acre urea 5 days after next rainfall. Crop is showing nitrogen deficiency signs.",
+        "hi": "अगली बारिश के 5 दिन बाद 15 किलो/एकड़ यूरिया डालें। फसल में नाइट्रोजन की कमी दिख रही है।",
+        "kn": "ಮುಂದಿನ ಮಳೆಯ 5 ದಿನ ಬಳಿಕ 15 ಕೆಜಿ/ಎಕರೆ ಯೂರಿಯಾ ಹಾಕಿ."
+      },
+      "quantity": "15 kg/acre",
+      "timing": "5 days after next rain",
+      "estimatedCost": 360,
+      "estimatedCostUnit": "INR/acre",
+      "voiceText": "ಮಳೆ ನಿಂತ 5 ದಿನ ನಂತರ 15 ಕೆಜಿ ಯೂರಿಯಾ ಹಾಕಿ."
+    },
+    {
+      "id": "fallback_003",
+      "type": "pest_control",
+      "priority": "medium",
+      "title": {
+        "en": "Preventive Pest Monitoring",
+        "hi": "कीट निगरानी करें",
+        "kn": "ಕೀಟ ಮೇಲ್ವಿಚಾರಣೆ ಮಾಡಿ"
+      },
+      "description": {
+        "en": "Spray neem oil (5ml/L) as a preventive measure. Check leaves weekly for pest signs.",
+        "hi": "नीम तेल (5ml/L) का छिड़काव करें। हर हफ्ते पत्तियों की जांच करें।",
+        "kn": "ತೇಗೆ ಎಣ್ಣೆ (5ml/L) ಸಿಂಪಡಿಸಿ. ಪ್ರತಿ ವಾರ ಎಲೆ ತಪಾಸಣೆ ಮಾಡಿ."
+      },
+      "quantity": "5 ml/L water",
+      "timing": "Within 7 days",
+      "estimatedCost": 150,
+      "estimatedCostUnit": "INR/acre",
+      "voiceText": "ವಾರದೊಳಗೆ ತೇಗೆ ಎಣ್ಣೆ ಸಿಂಪಡಿಸಿ."
+    }
+  ],
+  "summary": {
+    "overallRisk": "moderate",
+    "primaryConcern": "General crop maintenance",
+    "actionRequired": true
+  }
+}

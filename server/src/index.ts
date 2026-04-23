@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import mongoose from 'mongoose';
 
 import analyzeRouter from './routes/analyze';
 import recommendRouter from './routes/recommend';
@@ -51,5 +52,18 @@ app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
   logger.info(`Health check: http://localhost:${PORT}/api/health`);
 });
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/fasalrakshak';
+
+mongoose.connect(MONGODB_URI)
+  .then(() => {
+    logger.info('Connected to MongoDB');
+    app.listen(PORT, () => {
+      logger.info(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    logger.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
 
 export default app;

@@ -130,9 +130,9 @@ recommendRouter.post('/', async (req: Request, res: Response): Promise<void> => 
 
     res.json({
       success: true,
-      recommendations: result.recommendations,
-      aiGenerated: result.aiGenerated,
-      requestedLanguage: parsed.data.language,
+      timestamp: new Date().toISOString(),
+      requestId: `req-${Date.now()}`,
+      data: result.data,
     });
   } catch (err) {
     logger.error('Recommendation route error:', err);
