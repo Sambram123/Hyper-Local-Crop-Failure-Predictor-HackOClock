@@ -8,6 +8,8 @@ import referenceRouter from './routes/reference';
 import logger from './utils/logger';
 
 const PORT = process.env.PORT || 3001;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/fasalrakshak';
+
 const app = express();
 
 // ---------------------------------------------------------------------------
@@ -45,20 +47,15 @@ app.get('/api/health', (_req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Start
+// Database & Start
 // ---------------------------------------------------------------------------
-
-app.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`);
-  logger.info(`Health check: http://localhost:${PORT}/api/health`);
-});
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/fasalrakshak';
 
 mongoose.connect(MONGODB_URI)
   .then(() => {
     logger.info('Connected to MongoDB');
     app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
+      logger.info(`Health check: http://localhost:${PORT}/api/health`);
     });
   })
   .catch((err) => {
