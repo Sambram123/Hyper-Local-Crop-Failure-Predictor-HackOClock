@@ -42,6 +42,8 @@ export default function InputWizard() {
     setError(null);
     setView('loading');
 
+    let isOffline = false;
+
     try {
       let analysisData;
       try {
@@ -51,9 +53,12 @@ export default function InputWizard() {
           stage: { id: state.stage.id, name: state.stage.name.en },
         });
         analysisData = res.data;
+        console.info('[InputWizard] ✅ Using live API data');
       } catch {
         // Use mock data if API is unavailable
         analysisData = getMockAnalysis(state.district.name, state.crop.id, state.stage.id);
+        isOffline = true;
+        console.warn('[InputWizard] ⚠ API unavailable — using offline estimation');
       }
 
       setAnalysisResult(analysisData);
@@ -72,7 +77,9 @@ export default function InputWizard() {
         const mockRecs = getMockRecommendations(state.language);
         setRecommendations(mockRecs, {
           overallRisk: 'moderate',
-          primaryConcern: 'Drought stress is elevated. Monitor soil moisture.',
+          primaryConcern: isOffline
+            ? '⚡ Using offline estimation. Connect to server for real-time data.'
+            : 'Drought stress is elevated. Monitor soil moisture.',
           actionRequired: true,
         });
       }

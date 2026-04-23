@@ -1,9 +1,12 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "FasalRakshak backend — risk scoring engine and API",
+  "main": "dist/index.js",
   "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "build": "tsc",
     "test": "jest"
   },
   "keywords": [],
@@ -22,6 +25,7 @@
     "dotenv": "^17.4.2",
     "jest": "^30.3.0",
     "ts-jest": "^29.4.9",
+    "tsx": "^4.19.0",
     "typescript": "^6.0.3"
   }
 }

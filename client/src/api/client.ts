@@ -10,6 +10,30 @@ const client = axios.create({
 });
 
 // ============================================================
+// Request / Response logging
+// ============================================================
+
+client.interceptors.request.use((config) => {
+  console.info(`[API] → ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
+  return config;
+});
+
+client.interceptors.response.use(
+  (response) => {
+    console.info(`[API] ← ${response.status} ${response.config.url}`);
+    return response;
+  },
+  (error) => {
+    if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+      console.warn('[API] ⚠ Backend unreachable — will use offline data');
+    } else {
+      console.error(`[API] ✖ ${error.response?.status ?? 'NETWORK_ERROR'} ${error.config?.url}`, error.message);
+    }
+    return Promise.reject(error);
+  }
+);
+
+// ============================================================
 // Analysis API
 // ============================================================
 
