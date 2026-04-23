@@ -51,7 +51,7 @@
 │  │                 │  │  Controller │  │   Controller   │                   │
 │  │  - fetchWeather │  │             │  │                 │                   │
 │  │  - fetchNDVI    │  │  - call     │  │  - getDistricts│                   │
-│  │  - calculate   │  │    Claude   │  │  - getCrops     │                   │
+│  │  - calculate   │  │    Gemini   │  │  - getCrops     │                   │
 │  │    riskScores  │  │  - translate│  │  - getStages   │                   │
 │  └────────┬───────┘  └──────┬───────┘  └─────┬────────┘                   │
 │           │                 │                │                              │
@@ -69,8 +69,8 @@
         ┌────────────────────┼────────────────────┐
         │                    │                    │
 ┌───────▼─────────┐  ┌───────▼─────────┐  ┌───────▼─────────┐
-│   Open-Meteo    │  │  Sentinel-2    │  │  Anthropic      │
-│   API           │  │  /Copernicus  │  │  Claude API     │
+│   Open-Meteo    │  │  Sentinel-2    │  │  Google      │
+│   API           │  │  /Copernicus  │  │  Gemini API     │
 │  (Weather)      │  │  (NDVI)       │  │  (AI Gen)       │
 └────────────────┘  └────────────────┘  └────────────────┘
 
@@ -301,7 +301,7 @@ interface AnalyzeResponse {
 
 ### 2.4 POST /api/recommend
 
-**Description:** Generates multilingual, quantity-aware intervention recommendations using Claude API.
+**Description:** Generates multilingual, quantity-aware intervention recommendations using Gemini API.
 
 #### Request Schema
 
@@ -390,7 +390,7 @@ interface RecommendResponse {
       primaryConcern: string;
       actionRequired: boolean;
     };
-    generatedBy: string;    // "Claude-3-Opus-20240229"
+    generatedBy: string;    // "Gemini-3-Opus-20240229"
   };
   error?: { code: string; message: string };
 }
@@ -471,7 +471,7 @@ interface RecommendResponse {
       "primaryConcern": "Drought stress is critically high. Immediate irrigation required.",
       "actionRequired": true
     },
-    "generatedBy": "Claude-3-Opus-20240229"
+    "generatedBy": "Gemini-3-Opus-20240229"
   }
 }
 ```
@@ -484,7 +484,7 @@ interface RecommendResponse {
 | 400 | Invalid request |
 | 422 | Risk payload missing or invalid |
 | 500 | Server error |
-| 503 | Claude API unavailable |
+| 503 | Gemini API unavailable |
 
 ---
 
@@ -580,7 +580,7 @@ interface HealthResponse {
     cache: { status: "up" | "down"; latencyMs: number };
     weatherApi: { status: "up" | "down" | "degraded"; latencyMs: number };
     ndviApi: { status: "up" | "down" | "degraded"; latencyMs: number };
-    claudeApi: { status: "up" | "down" | "degraded"; latencyMs: number };
+    geminiApi: { status: "up" | "down" | "degraded"; latencyMs: number };
   };
   uptime: number;  // seconds since last restart
 }
@@ -686,7 +686,7 @@ interface HealthResponse {
 │              RECOMMENDATION GENERATION                                 │
 │                                                                       │
 │  ┌──────────────────────────────────────────────────────────────┐    │
-│  │ CLAUDE API CALL                                              │    │
+│  │ GEMINI API CALL                                              │    │
 │  │ - Construct prompt with risk data                          │    │
 │  │ - Include crop, stage, district context                    │    │
 │  │ - Specify language preference (en/hi/kn)                   │    │
@@ -697,7 +697,7 @@ interface HealthResponse {
 │                         ▼                                            │
 │  ┌──────────────────────────────────────────────────────────────┐    │
 │  │ RESPONSE PARSING                                            │    │
-│  │ - Parse Claude response JSON                                 │    │
+│  │ - Parse Gemini response JSON                                 │    │
 │  │ - Extract recommendations array                                │    │
 │  │ - Add translated titles/descriptions (hi, kn)               │    │
 │  │ - Create simplified voiceText for TTS                      │    │
@@ -751,7 +751,7 @@ Farmer → InputWizard → API Client → Express Router
                             ↓
                             ├───────────────────┐
                             ↓                   ↓
-                    /api/analyze        ClaudeAPI
+                    /api/analyze        GeminiAPI
                      Response          (recommend)
                             ↓                   ↓
                             └────────┬─────────┘
@@ -786,7 +786,7 @@ Error
 │   ├── ExternalAPIError (503)
 │   │   ├── WeatherAPIError
 │   │   ├── NDVIAPIError
-│   │   └── ClaudeAPIError
+│   │   └── GeminiAPIError
 │   └── InternalError (500)
 │
 └── NetworkError
@@ -822,8 +822,8 @@ interface ErrorResponse {
 | Open-Meteo | 404 | "Location data unavailable." | Return error |
 | NDVI API | Timeout/503 | "Satellite data unavailable. Using cached data." | Return cached NDVI |
 | NDVI API | Rate Limited | "High demand. Please try again in a few minutes." | Retry with exponential backoff |
-| Claude API | Timeout/503 | "Unable to generate recommendations. Please try again." | Retry once, then fallback to template |
-| Claude API | Rate Limited | "Service busy. Please wait 30 seconds." | Retry after delay |
+| Gemini API | Timeout/503 | "Unable to generate recommendations. Please try again." | Retry once, then fallback to template |
+| Gemini API | Rate Limited | "Service busy. Please wait 30 seconds." | Retry after delay |
 | MongoDB | Connection | "Database temporarily unavailable." | Retry with backoff |
 | Redis | Connection | N/A (silent) | Bypass cache, fetch fresh |
 
@@ -864,7 +864,7 @@ const errorMessages = {
 |------------------|----------------------|
 | Weather API unavailable | Return cached weather + `isFresh: false` indicator |
 | NDVI API unavailable | Return cached NDVI + use historical average as proxy |
-| Claude API unavailable | Return template-based recommendations with warning |
+| Gemini API unavailable | Return template-based recommendations with warning |
 | Database unavailable | Use in-memory fallback for static data (crops, districts) |
 | Cache unavailable | Fetch fresh data from external APIs (acceptable latency increase) |
 | All external services down | Return error with user-friendly message in selected language |
@@ -1052,7 +1052,7 @@ export class CacheService {
 |----------|----------|------|------------|
 | Open-Meteo | api.open-meteo.com/v1 | None | 10,000/day |
 | Copernicus | scihub.copernicus.eu | API Key | TBD |
-| Anthropic | api.anthropic.com | API Key | 50/min |
+| Google | api.google.com | API Key | 50/min |
 
 ---
 
@@ -1090,8 +1090,8 @@ REDIS_URL=redis://localhost:6379
 # External APIs
 OPEN_METEO_BASE_URL=https://api.open-meteo.com/v1
 COPERNICUS_API_KEY=your_key_here
-ANTHROPIC_API_KEY=your_key_here
-ANTHROPIC_MODEL=claude-3-opus-20240229
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL=gemini-1.5-pro
 
 # Frontend
 VITE_API_URL=http://localhost:3000/api
@@ -1113,7 +1113,7 @@ fasalrakshak/
 │   │   │   ├── ndvi.service.ts
 │   │   │   ├── risk-engine.service.ts
 │   │   │   ├── cache.service.ts
-│   │   │   └── claude.service.ts
+│   │   │   └── gemini.service.ts
 │   │   ├── routes/
 │   │   │   └── index.ts
 │   │   ├── middleware/

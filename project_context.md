@@ -18,7 +18,7 @@ A farmer enters 3 inputs: district, crop type, and growth stage. The system fetc
 | Backend | Node.js 18 + Express + TypeScript |
 | Database | MongoDB Atlas + Mongoose |
 | Validation | Zod |
-| AI | Anthropic Claude API — `claude-sonnet-4-20250514` |
+| AI | Google Gemini API — `gemini-1.5-pro` |
 | Weather Data | Open-Meteo API (free, no key) |
 | Satellite/NDVI | Sentinel-2 / Copernicus / MODIS |
 | Deployment | Docker + Docker Compose + Render.com |
@@ -50,7 +50,7 @@ fasalrakshak/
         │   ├── weather.ts         # Open-Meteo integration
         │   ├── ndvi.ts            # Satellite NDVI fetch
         │   ├── scoring.ts         # three-channel risk engine
-        │   └── claude.ts          # Anthropic API call
+        │   └── gemini.ts          # Google API call
         ├── models/
         │   ├── CropKnowledge.ts   # Mongoose model
         │   └── AnalysisCache.ts   # Mongoose model (TTL 6 hours)
@@ -156,15 +156,15 @@ Kannada (kn-IN, default) · Hindi (hi-IN) · English (en-IN)
 
 ---
 
-## Claude API Usage
+## Gemini API Usage
 
-- **File:** `server/src/services/claude.ts` — only file that calls Claude
-- **Model:** `claude-sonnet-4-20250514`
+- **File:** `server/src/services/gemini.ts` — only file that calls Gemini
+- **Model:** `gemini-1.5-pro`
 - **Temp:** `0` (deterministic)
 - **Max tokens:** `1000`
-- Claude receives the full risk payload and returns pure JSON with `kannada`, `hindi`, `english` arrays
+- Gemini receives the full risk payload and returns pure JSON with `kannada`, `hindi`, `english` arrays
 - Each recommendation has: `type`, `urgency`, `action` (with quantities/timing), `reason` (Grade 5 reading level)
-- If Claude fails → use `fallbackRecommendations.json`, set `aiGenerated: false`
+- If Gemini fails → use `fallbackRecommendations.json`, set `aiGenerated: false`
 
 ---
 
@@ -217,7 +217,7 @@ interface Recommendation {
 ```
 PORT=3001
 MONGODB_URI=mongodb+srv://...
-ANTHROPIC_API_KEY=sk-ant-...
+GEMINI_API_KEY=sk-ant-...
 OPEN_METEO_BASE_URL=https://api.open-meteo.com/v1
 ```
 
@@ -237,7 +237,7 @@ VITE_API_BASE_URL=http://localhost:3001
 - Mobile-first at 375px — Tailwind base styles are always mobile
 - Kannada text must use `font-family: 'Noto Sans Kannada'`
 - NDVI failure is non-fatal — proceed with `ndvi: null` and `ndviUnavailable: true`
-- Claude failure is non-fatal — serve fallback recommendations
+- Gemini failure is non-fatal — serve fallback recommendations
 - Open-Meteo failure IS fatal for `/api/analyze` — return 503
 
 ---
@@ -248,5 +248,5 @@ VITE_API_BASE_URL=http://localhost:3001
 |---|---|
 | M1 — Backend | Express server, Open-Meteo, NDVI fetch, MongoDB, districts.json |
 | M2 — Scoring | Risk engine (drought/pest/nutrient), cropKnowledge.json, unit tests |
-| M3 — AI | Claude API, prompt engineering, multilingual output, fallback recs |
+| M3 — AI | Gemini API, prompt engineering, multilingual output, fallback recs |
 | M4 — Frontend | React UI, Recharts, Web Speech API, mobile polish, PWA |

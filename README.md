@@ -1,6 +1,6 @@
 # FasalRakshak — Hyper-Local Crop Failure Predictor
 
-A mobile-first web application that predicts crop failure risk at the district level in India using satellite NDVI data, weather data from Open-Meteo API, and AI-generated recommendations via Claude API. Designed for small and marginal farmers with multi-language support (English, Hindi, Kannada) and voice readout for low-literacy users.
+A mobile-first web application that predicts crop failure risk at the district level in India using satellite NDVI data, weather data from Open-Meteo API, and AI-generated recommendations via Gemini API. Designed for small and marginal farmers with multi-language support (English, Hindi, Kannada) and voice readout for low-literacy users.
 
 ## Features
 
@@ -17,7 +17,7 @@ A mobile-first web application that predicts crop failure risk at the district l
 - **Backend**: Node.js (Express) or Python (FastAPI)
 - **Weather Data**: Open-Meteo API (free, no API key required)
 - **NDVI Data**: Sentinel-2 / MODIS satellite data
-- **Recommendations**: Claude API (Anthropic)
+- **Recommendations**: Gemini API (Google)
 - **Voice**: Web Speech API
 
 ## Getting Started

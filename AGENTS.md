@@ -1,6 +1,6 @@
 # AGENTS.md — FasalRakshak
 
-> This file is the canonical reference for any AI coding agent (Claude Code, Cursor, Copilot, etc.) working on the FasalRakshak codebase. Read this entire file before touching any code.
+> This file is the canonical reference for any AI coding agent (Gemini Code, Cursor, Copilot, etc.) working on the FasalRakshak codebase. Read this entire file before touching any code.
 
 ---
 
@@ -11,7 +11,7 @@
 **Hackathon:** Hyper-Local Crop Failure Predictor track  
 **Team:** Code Blooded  
 **Time constraint:** 18-hour sprint  
-**Stack:** React 18 + TypeScript + Vite + Tailwind (frontend) · Node.js + Express + Mongoose + MongoDB Atlas (backend) · Claude API (AI layer)
+**Stack:** React 18 + TypeScript + Vite + Tailwind (frontend) · Node.js + Express + Mongoose + MongoDB Atlas (backend) · Gemini API (AI layer)
 
 ---
 
@@ -46,7 +46,7 @@ fasalrakshak/
 │   │   │   ├── weather.ts        # Open-Meteo API integration
 │   │   │   ├── ndvi.ts           # Sentinel-2 / NDVI proxy
 │   │   │   ├── scoring.ts        # Three-channel risk engine
-│   │   │   └── claude.ts         # Anthropic API integration
+│   │   │   └── gemini.ts         # Google API integration
 │   │   ├── models/
 │   │   │   ├── CropKnowledge.ts  # Mongoose model
 │   │   │   └── AnalysisCache.ts  # Mongoose model
@@ -67,7 +67,7 @@ fasalrakshak/
 │   └── SPRINT_PLAN.md
 │
 ├── AGENTS.md                 # ← You are here
-├── SKILL.md                  # Project skill for Claude Code
+├── SKILL.md                  # Project skill for Gemini Code
 ├── docker-compose.yml
 └── README.md
 ```
@@ -91,7 +91,7 @@ fasalrakshak/
 | Service files | camelCase | `weather.ts` |
 | Constants | SCREAMING_SNAKE_CASE | `MAX_RISK_SCORE` |
 | MongoDB collections | camelCase plural | `cropKnowledges`, `analysisCaches` |
-| Env variables | SCREAMING_SNAKE_CASE | `ANTHROPIC_API_KEY` |
+| Env variables | SCREAMING_SNAKE_CASE | `GEMINI_API_KEY` |
 
 ### File Size Limits
 - No component file over **200 lines** — split into sub-components
@@ -113,7 +113,7 @@ Create a `.env` file in `server/` with:
 ```env
 PORT=3001
 MONGODB_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/fasalrakshak
-ANTHROPIC_API_KEY=sk-ant-...
+GEMINI_API_KEY=sk-ant-...
 OPEN_METEO_BASE_URL=https://api.open-meteo.com/v1
 COPERNICUS_USER=
 COPERNICUS_PASS=
@@ -268,17 +268,17 @@ composite = drought * weights.drought + pest * weights.pest + nutrient * weights
 
 ---
 
-## Claude API Usage
+## Gemini API Usage
 
-Claude is called **only** in `server/src/services/claude.ts`. No other file should import or call the Anthropic SDK.
+Gemini is called **only** in `server/src/services/gemini.ts`. No other file should import or call the Google SDK.
 
-**Model:** `claude-sonnet-4-20250514`  
+**Model:** `gemini-1.5-pro`  
 **Max tokens:** `1000`  
 **Temperature:** `0` (deterministic for consistency)
 
 The system prompt and user message template live in `docs/PROMPT_GUIDE.md`. Copy them exactly — do not improvise prompt changes without updating the doc.
 
-**Output contract:** Claude must return **only** a JSON object. If the response is not parseable JSON, use the fallback recommendations in `server/src/data/fallbackRecommendations.json`.
+**Output contract:** Gemini must return **only** a JSON object. If the response is not parseable JSON, use the fallback recommendations in `server/src/data/fallbackRecommendations.json`.
 
 ---
 
@@ -336,7 +336,7 @@ export function speakRecommendations(
 - HTTP status codes: 400 (bad input), 500 (server error), 503 (external API down)
 - If Open-Meteo is unreachable → return error, do not proceed to scoring
 - If NDVI API is unreachable → proceed with `ndvi: null`, use weather-only scoring with a warning flag
-- If Claude API fails → return hardcoded fallback recommendations from `fallbackRecommendations.json` with `{ aiGenerated: false }` flag in response
+- If Gemini API fails → return hardcoded fallback recommendations from `fallbackRecommendations.json` with `{ aiGenerated: false }` flag in response
 - Never expose raw error messages from external APIs to the client
 
 ---
@@ -349,7 +349,7 @@ export function speakRecommendations(
 - Do not hardcode API keys anywhere — always use `process.env`
 - Do not render recommendations in English if the user selected Kannada
 - Do not skip Zod validation on incoming requests
-- Do not call Claude more than once per `/api/recommend` request
+- Do not call Gemini more than once per `/api/recommend` request
 - Do not use `console.log` in production paths — use a simple `logger.ts` wrapper
 
 ---

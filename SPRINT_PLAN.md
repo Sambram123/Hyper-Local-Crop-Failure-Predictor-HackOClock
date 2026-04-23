@@ -13,7 +13,7 @@
 |------|-------|---------------------|
 | Backend & Data Engineer | Member 1 | Express API, Open-Meteo/MODIS integration, MongoDB |
 | Risk Scoring Engineer | Member 2 | Three-channel scoring algorithm, crop knowledge base |
-| AI Integration Engineer | Member 3 | Claude API, prompt engineering, multilingual output |
+| AI Integration Engineer | Member 3 | Gemini API, prompt engineering, multilingual output |
 | Frontend Engineer | Member 4 | React UI, Recharts, Web Speech API, mobile polish |
 
 ---
@@ -24,34 +24,34 @@
 
 | Hour | Backend & Data Engineer | Risk Scoring Engineer | AI Integration Engineer | Frontend Engineer |
 |------|----------------------|---------------------|----------------------|-------------------|
-| **0** | Project setup: Initialize Node.js repo, install dependencies (express, prisma, axios, cors, dotenv). Create folder structure. Review existing PRD/architecture docs. | Review CROP_KNOWLEDGE_BASE.md. Extract risk weight matrix. Create TypeScript interfaces for crops/stages. | Review PROMPT_ENGINEERING_GUIDE.md. Set up Anthropic API key. Test Claude API connectivity with simple request. | Initialize React 18 + Vite + Tailwind project. Configure Tailwind with brand colors. Set up React Router. |
+| **0** | Project setup: Initialize Node.js repo, install dependencies (express, prisma, axios, cors, dotenv). Create folder structure. Review existing PRD/architecture docs. | Review CROP_KNOWLEDGE_BASE.md. Extract risk weight matrix. Create TypeScript interfaces for crops/stages. | Review PROMPT_ENGINEERING_GUIDE.md. Set up Google API key. Test Gemini API connectivity with simple request. | Initialize React 18 + Vite + Tailwind project. Configure Tailwind with brand colors. Set up React Router. |
 | **1** | Set up Express server with basic routes (/health, /crops, /districts). Create district geo JSON (top 50 districts). Configure Prisma with MongoDB. | Create: `src/types/crops.ts` with 10 crop definitions. Create: `src/types/stages.ts` with growth stage interfaces. | Create system prompt file. Build request/response TypeScript types. Test API call with mock data. | Set up App.tsx with routing. Create basic layout components (Header, Footer). Set up AppContext for state. |
 | **2** | Implement GET /api/crops (return 10 crops). Implement GET /api/districts (return searchable list). Add CORS and helmet middleware. | Create crop knowledge base JSON structure. Map each crop to growth stages. Define drought sensitivity enums. | Write user message template with placeholder fields. Build output parser function. | Create InputWizard page skeleton with 3-step form. Add progress indicator component. |
-| **3** | Test all endpoints with curl. Document API in Postman/curl. Add error handling middleware. | Review and finalize crop-stage mapping. Create `cropKB.ts` loader utility. | Test Claude API with sample input. Verify JSON output parsing. | Create DistrictStep component with search. Create CropStep component with grid display. |
+| **3** | Test all endpoints with curl. Document API in Postman/curl. Add error handling middleware. | Review and finalize crop-stage mapping. Create `cropKB.ts` loader utility. | Test Gemini API with sample input. Verify JSON output parsing. | Create DistrictStep component with search. Create CropStep component with grid display. |
 
 ### Hours 3–6: Core Data Flow
 
 | Hour | Backend & Data Engineer | Risk Scoring Engineer | AI Integration Engineer | Frontend Engineer |
 |------|----------------------|---------------------|----------------------|-------------------|
 | **4** | Implement Open-Meteo weather API integration. Create weather service with caching (6hr TTL). | Create riskEngine service with three-channel scoring. Implement drought calculation: precip deficit + ET0 + NDVI. | Build recommend endpoint request transformer. Prepare full risk payload construction. | Create StageStep component with stage list. Hook up form navigation (Next/Back). |
-| **5** | Implement MODIS/Sentinel NDVI fetch (or mock with realistic NDVI data). Create NDVI service. | Implement pest pressure calculation: humidity + temp + NDVI decline. Add historical correlation placeholder. | Create /api/recommend endpoint stub. Pass-through to Claude with formatted prompt. | Wire up InputWizard → API call. Test 3-step form flow. |
-| **6** | Integrate weather + NDVI + scoring in /api/analyze endpoint. Create risk payload response. | Implement nutrient deficiency calculation: NDVI threshold + rain leaching. Create composite score: 40% drought, 30% pest, 30% nutrient. | Integrate Claude API call in /recommend. Parse output to structured JSON. Verify 3-language output. | Create RiskDashboard page skeleton. Add ScoreGauge component (circular SVG). |
+| **5** | Implement MODIS/Sentinel NDVI fetch (or mock with realistic NDVI data). Create NDVI service. | Implement pest pressure calculation: humidity + temp + NDVI decline. Add historical correlation placeholder. | Create /api/recommend endpoint stub. Pass-through to Gemini with formatted prompt. | Wire up InputWizard → API call. Test 3-step form flow. |
+| **6** | Integrate weather + NDVI + scoring in /api/analyze endpoint. Create risk payload response. | Implement nutrient deficiency calculation: NDVI threshold + rain leaching. Create composite score: 40% drought, 30% pest, 30% nutrient. | Integrate Gemini API call in /recommend. Parse output to structured JSON. Verify 3-language output. | Create RiskDashboard page skeleton. Add ScoreGauge component (circular SVG). |
 
 ### Hours 6–9: Integration & Polish
 
 | Hour | Backend & Data Engineer | Risk Scoring Engineer | AI Integration Engineer | Frontend Engineer |
 |------|----------------------|---------------------|----------------------|-------------------|
-| **7** | **INTEGRATION CHECKPOINT #1 (Hr 8)**. All three data sources integrated. Fix any API response mismatches. Create 7-day forecast logic. | Run scoring algorithm on test data (rice, Dharwad, vegetative). Verify outputs 0-100. | Test Claude with full risk payload for 3 scenarios. Fix prompt issues. Verify Hindi/Kannada output structure. | Create ChannelBars component (3 progress bars with colors). Add animated transitions. |
+| **7** | **INTEGRATION CHECKPOINT #1 (Hr 8)**. All three data sources integrated. Fix any API response mismatches. Create 7-day forecast logic. | Run scoring algorithm on test data (rice, Dharwad, vegetative). Verify outputs 0-100. | Test Gemini with full risk payload for 3 scenarios. Fix prompt issues. Verify Hindi/Kannada output structure. | Create ChannelBars component (3 progress bars with colors). Add animated transitions. |
 | **8** | Add data freshness indicators to all responses. Add error handling for API failures. Cache invalidation logic. | Generate risk weight lookup table (10 crops × 6 stages). Add unit tests for scoring (if time permits). | Verify urgency sorting works. Add cost estimation to output. | Fetch and display risk scores from API. Test loading states. |
 
 ### Hours 9–12: Frontend Completion
 
 | Hour | Backend & Data Engineer | Risk Scoring Engineer | AI Integration Engineer | Frontend Engineer |
 |------|----------------------|---------------------|----------------------|-------------------|
-| **9** | Buffer: Fix any remaining backend issues. Add logging. Create fallback mock data for demo. | Add crop-specific thresholds to scoring. Add seasonal adjustments. | Create template-based fallback for Claude failure (Tier 4). Add user-facing error messages in 3 languages. | Create ForecastChart using Recharts. Display 7-day risk forecast. |
+| **9** | Buffer: Fix any remaining backend issues. Add logging. Create fallback mock data for demo. | Add crop-specific thresholds to scoring. Add seasonal adjustments. | Create template-based fallback for Gemini failure (Tier 4). Add user-facing error messages in 3 languages. | Create ForecastChart using Recharts. Display 7-day risk forecast. |
 | **10** | Optimize API response size. Ensure <500KB page weight. Test on 3G throttle. | Add debug logs for scoring (for demo explanation). Add baseline comparison. | Verify voiceText field for Kannada TTS. Ensure action includes quantities. | Display weather summary. Create weather icons. |
 | **11** | Full API endpoint testing. Verify all routes return correct schemas. | Scoring verification with multiple crops/stages. | Test all language combinations. Verify no brand name recommendations. | Create Recommendations page. Display recommendation cards with urgency badges. |
-| **12** | **INTEGRATION CHECKPOINT #2 (Hr 14)**. Full stack integration test. Verify end-to-end flow. | Scoring calibration check. Verify composite scores match expected ranges. | Claude output accuracy check. Verify recommended quantities are specific. | Language toggle (EN/HI/KN). Connect state from Dashboard to Recommendations. |
+| **12** | **INTEGRATION CHECKPOINT #2 (Hr 14)**. Full stack integration test. Verify end-to-end flow. | Scoring calibration check. Verify composite scores match expected ranges. | Gemini output accuracy check. Verify recommended quantities are specific. | Language toggle (EN/HI/KN). Connect state from Dashboard to Recommendations. |
 
 ### Hours 12–15: Polish & Demo Prep
 
@@ -59,7 +59,7 @@
 |------|----------------------|---------------------|----------------------|-------------------|
 | **13** | Performance optimization. Ensure response <3s. Add rate limiting. | Risk score explanation text (for demo). Add "why this score" context. | Add primary concern summary to output. Ensure all recommendations have cost estimates. | Voice readout button with Web Speech API (Kannada). Test TTS playback. |
 | **14** | **CHECKPOINT: END-TO-END**. Full flow test: Input → Dashboard → Recommendations. Verify all 3 languages display. | Scoring engine ready. Risk explanation ready. | Recommendations ready in all languages. Fallback ready. | Mobile responsiveness check. Test on 375px viewport. |
-| **15** | Buffer: Fix critical bugs only. Ensure /health returns healthy. | Buffer: Calibrate edge cases. | Buffer: Fix any Claude response issues. | Buffer: Fix mobile UI issues. Touch target verification. |
+| **15** | Buffer: Fix critical bugs only. Ensure /health returns healthy. | Buffer: Calibrate edge cases. | Buffer: Fix any Gemini response issues. | Buffer: Fix mobile UI issues. Touch target verification. |
 
 ### Hours 15–18: Demo & Wrap-Up
 
@@ -87,7 +87,7 @@
 │  weather + NDVI ◄──────┴────────┘                                                  │
 │       │                                                                      │
 │       ▼                                                                      │
-│  /api/recommend ◄─────────────► Claude API (AI Engineer)                            │
+│  /api/recommend ◄─────────────► Gemini API (AI Engineer)                            │
 │                                         │                                        │
 │                                         ▼                                        │
 │                              recommendations ◄────────────                          │
@@ -106,9 +106,9 @@
 | Weather API integration | — | /api/analyze | Mock data on API failure |
 | NDVI data | Weather service | Risk scoring | Use weather proxy |
 | Scoring algorithm | Crop KB + Weather | Composite score | Simplified formula |
-| Claude API | Risk payload | /recommend | Template fallback |
+| Gemini API | Risk payload | /recommend | Template fallback |
 | Frontend | Backend API | Full flow test | Mock responses |
-| Language toggle | Claude + State | Recommendations page | Pre-translate |
+| Language toggle | Gemini + State | Recommendations page | Pre-translate |
 | Voice readout | Web Speech API | Kannada TTS | Text-only fallback |
 
 ### Parallel Workstreams
@@ -155,7 +155,7 @@ BLOCKERS AT CHECKPOINT 1:
 
 ```
 COMPLETE:
-☑ /api/recommend returns Claude-generated recommendations
+☑ /api/recommend returns Gemini-generated recommendations
 ☑ 3 languages (EN/HI/KN) in output
 ☑ Quantity-aware recommendations (kg, liters, timing)
 ☑ Frontend displays score gauge with color coding
@@ -169,7 +169,7 @@ TEST SCENARIO:
 Complete flow: District → Crop → Stage → Analyze → View Recommendations → Toggle Language → Voice Readout
 
 BLOCKERS AT CHECKPOINT 2:
-- If Claude fails → Use template fallbackTier 4
+- If Gemini fails → Use template fallbackTier 4
 - If voice fails → Show text only
 - If language missing → Fallback to English
 ```
@@ -180,16 +180,16 @@ BLOCKERS AT CHECKPOINT 2:
 
 | # | Risk | Likelihood | Impact | Mitigation | Owner |
 |---|------|-----------|-------|------------|-------|
-| 1 | **External API unavailability** (Open-Meteo/Claude down) | Medium | Critical | Cache responses; Use mock data; Template fallback | Backend |
+| 1 | **External API unavailability** (Open-Meteo/Gemini down) | Medium | Critical | Cache responses; Use mock data; Template fallback | Backend |
 | 2 | **NDVI data latency** (>14 days old) | High | Low | Show data freshness indicator; Use weather proxy; | Backend |
-| 3 | **Claude JSON output parsing fails** | Medium | High | Validate with Zod; Add try-catch; Use template fallback | AI |
+| 3 | **Gemini JSON output parsing fails** | Medium | High | Validate with Zod; Add try-catch; Use template fallback | AI |
 | 4 | **Frontend integration issues** (API response mismatch) | Medium | High | Define shared TypeScript types; Mock responses; | Frontend |
 | 5 | **Mobile responsiveness problems** | Low | Medium | Design mobile-first from start; Test on 375px; | Frontend |
 
 ### Top 5 Mitigations Summary
 
 1. **All external APIs cache for 6-12 hours** — Prevents demo failure if APIs go down mid-presentation
-2. **Template fallback (Tier 4) ready** — If Claude fails, show pre-generated recommendations
+2. **Template fallback (Tier 4) ready** — If Gemini fails, show pre-generated recommendations
 3. **Shared TypeScript types** — Backend and Frontend use same interfaces
 4. **Mock data for all API responses** — Can demo without any external calls
 5. **Demo scenario pre-generated** — Input= Dharwad/Ragi/vegetative cached
@@ -273,7 +273,7 @@ on their phone."
 
 - Show pre-generated screenshots
 - Show Postman API responses
-- Show Claude API output JSON
+- Show Gemini API output JSON
 
 ---
 
@@ -350,7 +350,7 @@ on their phone."
 │                                                      │
 │   If scoring fails → ALL downstream breaks:            │
 │   • /api/analyze returns garbage                   │
-│   • Claude gets wrong input                        │
+│   • Gemini gets wrong input                        │
 │   • Recommendations are meaningless                 │
 │   • Entire demo fails                            │
 │                                                      │
@@ -359,7 +359,7 @@ on their phone."
 ### Why This is Critical
 
 1. Downstream of every data source (weather, NDVI)
-2. Input to Claude API — wrong scores = wrong recommendations
+2. Input to Gemini API — wrong scores = wrong recommendations
 3. The "magic" that makes FasalRakshak valuable
 4. Judges will evaluate risk scoring accuracy
 

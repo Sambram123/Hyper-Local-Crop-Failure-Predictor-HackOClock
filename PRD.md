@@ -32,7 +32,7 @@ FasalRakshak addresses these gaps by building a user-centric system that transla
 
 ## 2. Executive Summary
 
-FasalRakshak is a mobile-first web application that predicts crop failure risk at the district level using publicly available satellite data (NDVI from Sentinel-2/MODIS) and weather data (Open-Meteo API). The system accepts three inputs from the farmer—district location, crop type, and growth stage—and outputs a composite 0-100 crop health score with a 7-day risk forecast, along with 3-5 actionable recommendations generated via Claude API in English, Hindi, or Kannada. A voice readout feature using Web Speech API enables usage by low-literacy farmers.
+FasalRakshak is a mobile-first web application that predicts crop failure risk at the district level using publicly available satellite data (NDVI from Sentinel-2/MODIS) and weather data (Open-Meteo API). The system accepts three inputs from the farmer—district location, crop type, and growth stage—and outputs a composite 0-100 crop health score with a 7-day risk forecast, along with 3-5 actionable recommendations generated via Gemini API in English, Hindi, or Kannada. A voice readout feature using Web Speech API enables usage by low-literacy farmers.
 
 The three-channel risk scoring engine differentiates between:
 
@@ -92,7 +92,7 @@ Key differentiators from existing solutions include: (1) multi-language output i
 | F-US-04 | As a farmer, I want to receive a single composite crop health score (0-100) so that I can quickly understand my crop's overall status. | Score is displayed as a circular gauge with a color gradient (green >70, yellow 40-70, red <40). Score calculation runs server-side and is cached for 6 hours. |
 | F-US-05 | As a farmer, I want to see a 7-day risk forecast so that I can plan interventions proactively. | Forecast shows daily risk levels for each of the three channels (drought stress, pest pressure, nutrient deficiency) with icons and simple text. |
 | F-US-06 | As a farmer, I want to receive 3-5 specific interventions so that I can take immediate action. | Each recommendation includes: (1) action type (e.g., irrigation, fertilizer, pest control), (2) quantity (e.g., "2 liters per sq meter," "urea 15 kg/acre"), (3) timing (e.g., "today," "within 48 hours"), and (4) estimated cost (e.g., "₹250/acre"). |
-| F-US-07 | As a farmer, I want to read recommendations in my preferred language (English, Hindi, or Kannada) so that I can understand them clearly. | Language toggle switches all content. Default language is based on the selected district's primary language. Translations are provided by Claude API. |
+| F-US-07 | As a farmer, I want to read recommendations in my preferred language (English, Hindi, or Kannada) so that I can understand them clearly. | Language toggle switches all content. Default language is based on the selected district's primary language. Translations are provided by Gemini API. |
 | F-US-08 | As a farmer, I want to hear recommendations read aloud in Kannada so that I can use the app without reading. | Voice button triggers Web Speech API synthesis in Kannada (kn-IN). Playback controls (play, pause, stop) are visible. Speech rate is adjustable (0.8x to 1.2x). |
 | F-US-09 | As a farmer, I want the interface to be usable on a basic smartphone so that I do not need an expensive device or stable internet. | App loads in under 5 seconds on 3G networks. Total page weight is under 500KB. UI is responsive from 320px width and above. Touch targets are minimum 44x44px. |
 
@@ -121,7 +121,7 @@ Key differentiators from existing solutions include: (1) multi-language output i
 | FR-06 | Three-Channel Risk Scoring | The system shall compute three separate risk scores: drought stress, pest pressure, and nutrient deficiency—each on a 0-100 scale. | Must Have |
 | FR-07 | Composite Health Score | The system shall compute a weighted composite crop health score (0-100) from the three channel scores. Default weights: drought 40%, pest 30%, nutrient 30%. | Must Have |
 | FR-08 | 7-Day Forecast | The system shall generate a 7-day forecast for each risk channel based on weather predictions from Open-Meteo. | Must Have |
-| FR-09 | Recommendation Generation | The system shall generate 3-5 interventions via Claude API that are quantity-aware, crop-specific, growth-stage-aware, and locally calibrated. | Must Have |
+| FR-09 | Recommendation Generation | The system shall generate 3-5 interventions via Gemini API that are quantity-aware, crop-specific, growth-stage-aware, and locally calibrated. | Must Have |
 | FR-10 | Multi-Language Output | The system shall deliver recommendations in English, Hindi, and Kannada. Language shall be selectable on the UI. | Must Have |
 | FR-11 | Voice Readout | The system shall provide a voice readout button that uses Web Speech API to read recommendations in Kannada (kn-IN). | Should Have |
 | FR-12 | Extension Dashboard | The system shall provide a dashboard for extension officers with district-level aggregation, filtering, and export capabilities. | Should Have |
@@ -188,7 +188,7 @@ Key differentiators from existing solutions include: (1) multi-language output i
 | Marathi | Devanagari | mr-IN | Out of Scope (Phase 2) |
 | Bengali | Bengali | bn-IN | Out of Scope (Phase 2) |
 
-All non-English translations shall be provided via Claude API at runtime. Static fallback translations shall be cached for offline resilience.
+All non-English translations shall be provided via Gemini API at runtime. Static fallback translations shall be cached for offline resilience.
 
 ### 6.4 Reliability Requirements
 
@@ -248,7 +248,7 @@ The following items are explicitly out of scope for the MVP (Version 1.0) and ma
 |--------|------------|--------------|--------------|
 | Crop Health Score Computation Rate | Percentage of requests that successfully return a composite score | >95% | Server-side logs |
 | Time to First Score | Median time from form submission to score display | <10 seconds | Client-side performance API |
-| Recommendation Accuracy | Percentage of recommendations that are syntactically valid and quantity-aware | >90% | Claude API response sampling |
+| Recommendation Accuracy | Percentage of recommendations that are syntactically valid and quantity-aware | >90% | Gemini API response sampling |
 | Voice Readup Completion Rate | Percentage of users who start voice playback and complete it | >70% | Client-side event tracking |
 | Error Rate | Percentage of requests resulting in user-visible error messages | <2% | Server-side logs |
 
@@ -317,7 +317,7 @@ The following items are explicitly out of scope for the MVP (Version 1.0) and ma
        ▼
 ┌─────────────────────────────────────────────┐
 │         Recommendation Generator            │
-│        (Claude API - Text Model)           │
+│        (Gemini API - Text Model)           │
 └─────────────────────────────────────────────┘
        │
        ▼
@@ -335,7 +335,7 @@ The following items are explicitly out of scope for the MVP (Version 1.0) and ma
 | Frontend | HTML5, CSS3, Vanilla JavaScript (ES6+) | No framework required for MVP; lightweight and fast. Alternatives: React or Vue only if state management becomes complex. |
 | Styling | CSS Grid + Flexbox + Custom Properties | Responsive without Bootstrap dependency. |
 | Backend | Node.js (Express) or Python (FastAPI) | FastAPI recommended for Python-native ML/Scoring libraries. |
-| External APIs | Open-Meteo (weather), Sentinel-2/MODIS (NDVI proxy), Claude API (recommendations) | Open-Meteo requires no API key. Claude API for language generation. |
+| External APIs | Open-Meteo (weather), Sentinel-2/MODIS (NDVI proxy), Gemini API (recommendations) | Open-Meteo requires no API key. Gemini API for language generation. |
 | Caching | Redis (production) or in-memory (MVP) | Reduces API calls and improves response time. |
 | Deployment | Vercel/Netlify (frontend) + Render/Railway (backend) | Free tier available; rapid deployment. |
 
@@ -382,7 +382,7 @@ The following items are explicitly out of scope for the MVP (Version 1.0) and ma
 | Evapotranspiration (ET0) | Reference evapotranspiration—the sum of evaporation and plant transpiration. |
 | Crop Health Score | Composite 0-100 score reflecting overall crop vitality based on drought, pest, and nutrient channels. |
 | Growth Stage | The phase of crop development (e.g., vegetative, flowering, grain filling). |
-| Claude API | Anthropic's Claude language model API for generating natural language recommendations. |
+| Gemini API | Google's Gemini language model API for generating natural language recommendations. |
 | Web Speech API | Browser API for text-to-speech synthesis. |
 | Open-Meteo | Open-source weather API providing free weather data without API keys. |
 

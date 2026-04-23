@@ -4,7 +4,7 @@ description: >
   Full project skill for FasalRakshak — a hyper-local crop failure predictor 
   for Indian farmers. Use this skill whenever working on any part of this 
   codebase: adding features, fixing bugs, writing new services, building 
-  React components, engineering Claude prompts, seeding MongoDB, or debugging 
+  React components, engineering Gemini prompts, seeding MongoDB, or debugging 
   the risk scoring engine. This skill encodes all project-specific constraints, 
   data contracts, naming conventions, and architectural decisions so you never 
   have to guess. Trigger this for ANY task involving FasalRakshak code, docs, 
@@ -19,7 +19,7 @@ FasalRakshak is a **three-layer web application**:
 
 1. **Data Layer** — fetches live weather (Open-Meteo) and NDVI satellite data (Sentinel-2/MODIS) for a farmer's district
 2. **Scoring Layer** — runs a three-channel risk engine (drought, pest, nutrient) producing a 0–100 composite crop health score with a 7-day forecast
-3. **AI Layer** — passes the structured risk payload to Claude API which generates 3–5 hyper-specific interventions in Kannada, Hindi, and English, with voice readout via Web Speech API
+3. **AI Layer** — passes the structured risk payload to Gemini API which generates 3–5 hyper-specific interventions in Kannada, Hindi, and English, with voice readout via Web Speech API
 
 The farmer inputs only three things: **district**, **crop**, and **growth stage**. No login. No GPS required. Works on a 3G Android browser.
 
@@ -33,7 +33,7 @@ Always read these files first for the domain you're working in:
 |---|---|
 | Any backend work | `AGENTS.md` → API Contract section |
 | Risk scoring changes | `AGENTS.md` → Risk Scoring Rules section |
-| Claude prompt changes | `docs/PROMPT_GUIDE.md` |
+| Gemini prompt changes | `docs/PROMPT_GUIDE.md` |
 | New React component | `AGENTS.md` → Frontend Component Rules + `docs/FRONTEND_COMPONENTS.md` |
 | MongoDB schema changes | `AGENTS.md` → MongoDB Schemas section |
 | Crop knowledge edits | `docs/CROP_KNOWLEDGE.md` |
@@ -45,7 +45,7 @@ Always read these files first for the domain you're working in:
 ```
 Frontend : React 18 · TypeScript · Vite · Tailwind CSS · Recharts · Web Speech API
 Backend  : Node.js 18 · Express · Mongoose · MongoDB Atlas · Zod · Axios
-AI       : Anthropic Claude API (claude-sonnet-4-20250514)
+AI       : Google Gemini API (gemini-1.5-pro)
 Data     : Open-Meteo (weather) · Sentinel-2/Copernicus (NDVI) · cropKnowledge.json
 Deploy   : Docker Compose · Render.com
 ```
@@ -81,16 +81,16 @@ Each crop has 5–6 growth stages. Each stage has:
 
 ---
 
-## Claude API Rules
+## Gemini API Rules
 
-- Called **only** from `server/src/services/claude.ts`
-- Model: `claude-sonnet-4-20250514` — do not change
+- Called **only** from `server/src/services/gemini.ts`
+- Model: `gemini-1.5-pro` — do not change
 - Temperature: `0` for deterministic output
 - Output must be **pure JSON** — no markdown, no preamble
 - If JSON parse fails → use fallback from `server/src/data/fallbackRecommendations.json`
 - The prompt template is in `docs/PROMPT_GUIDE.md` — copy exactly, don't improvise
 
-**Output shape Claude must return:**
+**Output shape Gemini must return:**
 ```json
 {
   "kannada": [{ "type": "", "urgency": "", "action": "", "reason": "" }],
@@ -159,8 +159,8 @@ Same thresholds apply to individual channel cards.
 
 - `server/src/data/cropKnowledge.json` — the knowledge base
 - `server/src/data/districts.json` — district coordinate lookup
-- `server/src/data/fallbackRecommendations.json` — Claude failure fallback
-- `docs/PROMPT_GUIDE.md` — Claude prompt specification
+- `server/src/data/fallbackRecommendations.json` — Gemini failure fallback
+- `docs/PROMPT_GUIDE.md` — Gemini prompt specification
 - `AGENTS.md` — agent conventions
 
 ---
@@ -175,4 +175,4 @@ Same thresholds apply to individual channel cards.
 - [ ] Voice readout plays on Android Chrome
 - [ ] App loads on 3G (< 3s first contentful paint)
 - [ ] No login or account required
-- [ ] Fallback recommendations work when Claude API is unavailable
+- [ ] Fallback recommendations work when Gemini API is unavailable

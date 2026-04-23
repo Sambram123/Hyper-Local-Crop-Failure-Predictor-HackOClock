@@ -1,8 +1,8 @@
-# FasalRakshak — Claude Prompt Engineering Guide
+# FasalRakshak — Gemini Prompt Engineering Guide
 
 ## Overview
 
-The Claude API is called once per user request at the `/api/recommend` endpoint. It receives a structured risk payload and returns 3–5 hyper-specific interventions in all three languages simultaneously — Kannada, Hindi, and English. This document specifies the exact prompt, the output contract, worked examples, fallback strategy, and tuning guidelines.
+The Gemini API is called once per user request at the `/api/recommend` endpoint. It receives a structured risk payload and returns 3–5 hyper-specific interventions in all three languages simultaneously — Kannada, Hindi, and English. This document specifies the exact prompt, the output contract, worked examples, fallback strategy, and tuning guidelines.
 
 ---
 
@@ -10,7 +10,7 @@ The Claude API is called once per user request at the `/api/recommend` endpoint.
 
 ```typescript
 {
-  model: "claude-sonnet-4-20250514",
+  model: "gemini-1.5-pro",
   max_tokens: 1000,
   temperature: 0,   // deterministic — same input always gives same output
 }
@@ -20,7 +20,7 @@ The Claude API is called once per user request at the `/api/recommend` endpoint.
 
 ## System Prompt
 
-Copy this exactly into `server/src/services/claude.ts`. Do not paraphrase.
+Copy this exactly into `server/src/services/gemini.ts`. Do not paraphrase.
 
 ```
 You are a senior agronomist advising small-scale Indian farmers. 
@@ -57,7 +57,7 @@ Output format:
 
 ## User Message Template
 
-Build this string in `server/src/services/claude.ts` and pass it as the user message:
+Build this string in `server/src/services/gemini.ts` and pass it as the user message:
 
 ```typescript
 const userMessage = `
@@ -96,14 +96,14 @@ Generate recommendations now.
 ## Output Parsing
 
 ```typescript
-import Anthropic from "@anthropic-ai/sdk"
+import Google from "@google/generative-ai"
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const client = new Google({ apiKey: process.env.GEMINI_API_KEY })
 
 export async function getRecommendations(payload: RiskPayload) {
   try {
     const response = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "gemini-1.5-pro",
       max_tokens: 1000,
       temperature: 0,
       system: SYSTEM_PROMPT,
@@ -120,13 +120,13 @@ export async function getRecommendations(payload: RiskPayload) {
 
     // Validate structure
     if (!parsed.kannada || !parsed.hindi || !parsed.english) {
-      throw new Error("Missing language keys in Claude response")
+      throw new Error("Missing language keys in Gemini response")
     }
 
     return { success: true, recommendations: parsed, aiGenerated: true }
 
   } catch (err) {
-    console.error("Claude API failed:", err)
+    console.error("Gemini API failed:", err)
     return {
       success: true,
       recommendations: getFallbackRecommendations(payload.crop, payload.growthStage),
@@ -164,7 +164,7 @@ export async function getRecommendations(payload: RiskPayload) {
 }
 ```
 
-**Expected Claude output (abbreviated):**
+**Expected Gemini output (abbreviated):**
 ```json
 {
   "kannada": [
@@ -282,7 +282,7 @@ Tighten: `"Generate exactly 3 recommendations if composite score is below 50, an
 | Total input tokens | ~460 |
 | Output tokens (3 languages × 4 recs) | ~600 |
 | Total per call | ~1,060 tokens |
-| Claude Sonnet cost per call | ~$0.004 |
+| Gemini cost per call | ~$0.004 |
 | Calls per demo (estimated 50) | ~$0.20 total |
 
 Well within free-tier / hackathon budget.
@@ -291,7 +291,7 @@ Well within free-tier / hackathon budget.
 
 ## Fallback Recommendations
 
-If Claude API fails for any reason, `server/src/data/fallbackRecommendations.json` provides static but crop-stage-specific recommendations for all 10 crops × 5 stages combinations.
+If Gemini API fails for any reason, `server/src/data/fallbackRecommendations.json` provides static but crop-stage-specific recommendations for all 10 crops × 5 stages combinations.
 
 Fallback recommendations:
 - Are pre-written in Kannada, Hindi, and English

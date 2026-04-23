@@ -2,8 +2,8 @@
 
 **Version:** 1.0  
 **Date:** April 23, 2026  
-**Model:** Claude Sonnet 4 (claude-sonnet-4-20250514)  
-**Provider:** Anthropic API
+**Model:** Gemini 1.5 Pro (gemini-1.5-pro)  
+**Provider:** Google API
 
 ---
 
@@ -208,7 +208,7 @@ interface Output {
     "growthStage": "vegetative",
     "compositeScore": 52,
     "generatedAt": "2026-04-23T10:30:15.000Z",
-    "model": "claude-sonnet-4-20250514"
+    "model": "gemini-1.5-pro"
   }
 }
 ```
@@ -335,7 +335,7 @@ interface Output {
     "growthStage": "vegetative",
     "compositeScore": 38,
     "generatedAt": "2026-04-23T10:30:15.000Z",
-    "model": "claude-sonnet-4-20250514"
+    "model": "gemini-1.5-pro"
   }
 }
 ```
@@ -523,19 +523,19 @@ Run A/B tests when:
 ┌──────────────────────────────────────────────────────────────┐
 │                    FALLBACK HIERARCHY                        │
 ├──────────────────────────────────────────────────────────────┤
-│ Tier 1: Claude API (Primary)                                 │
-│   - Model: claude-sonnet-4-20250514                         │
+│ Tier 1: Gemini API (Primary)                                 │
+│   - Model: gemini-1.5-pro                         │
 │   - Temperature: 0.3                                        │
 │   - Max tokens: 2000                                        │
 ├──────────────────────────────────────────────────────────────┤
-│ Tier 2: Claude API Retry (Same model, retry once)            │
+│ Tier 2: Gemini API Retry (Same model, retry once)            │
 │   - Delay: 2 seconds                                        │
 │   - Timeout: 30 seconds                                     │
 ├───────���─���────────────────────────────────────────────────────┤
-│ Tier 3:Claude API (Haiku fallback)                          │
-│   - Model: claude-3-haiku-20240307                         │
+│ Tier 3:Gemini API (Haiku fallback)                          │
+│   - Model: gemini-3-haiku-20240307                         │
 │   - Keep system prompt, shorter max_tokens                  │
-│   - Only if Sonnet fails                                    │
+│   - Only if Gemini fails                                    │
 ├──────────────────────────────────────────────────────────────┤
 │ Tier 4: Template-Based Fallback (Rule-based)                │
 │   - Use hardcoded templates by risk level                    │
@@ -592,8 +592,8 @@ const TEMPLATE_RECOMMENDATIONS = {
 async function generateRecommendations(input: RecommendationInput): Promise<RecommendationOutput> {
   try {
     // Tier 1: Primary API call
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+    const response = await google.messages.create({
+      model: 'gemini-1.5-pro',
       max_tokens: 2000,
       temperature: 0.3,
       system: SYSTEM_PROMPT,
@@ -648,7 +648,7 @@ async function generateRecommendations(input: RecommendationInput): Promise<Reco
 ### 7.2 Cost Calculation
 
 ```
-Pricing (Claude Sonnet 4):
+Pricing (Gemini 1.5 Pro):
 - Input: $3.00 per million tokens
 - Output: $15.00 per million tokens
 
@@ -725,4 +725,4 @@ CONSTRAINTS: No brands, no flowering pesticides, quantities required
 *Document Version: 1.0*  
 *Last Updated: April 23, 2026*  
 *Author: AI Engineering Team, FasalRakshak*  
-*Model: Claude Sonnet 4 (claude-sonnet-4-20250514)*
+*Model: Gemini 1.5 Pro (gemini-1.5-pro)*
